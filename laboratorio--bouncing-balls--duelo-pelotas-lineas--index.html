@@ -1,0 +1,133 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Duelo de pelotas y líneas — Arquitools</title><meta name="description" content="Dos pelotas rebotan, generan líneas y cortan las del rival. Cambia las reglas, los colores y el sonido del duelo."><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23233d32'/%3E%3Ctext x='6' y='24' font-family='Arial' font-size='27' font-weight='bold' fill='%23d8eb6a'%3Ea%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./oficina.css"><link rel="stylesheet" href="./laboratorio--bouncing-balls--pelota-aros--simulador.css"><link rel="stylesheet" href="./laboratorio--bouncing-balls--duelo-pelotas-lineas--duelo.css"><script defer src="./laboratorio--bouncing-balls--duelo-pelotas-lineas--simulador.js"></script><script src="./rutas.js"></script></head><body><header><a href="./index.html" class="brand" aria-label="Arquitools, inicio"><b aria-hidden="true">a/</b>arquitools<span style="color:#869870">.</span></a><nav aria-label="Navegación principal"><a href="./index.html#oficina">La oficina</a><a href="./index.html#servicios">Servicios</a><a href="./laboratorio--index.html" aria-current="page">Laboratorio</a><a href="./index.html#contacto">Contacto ↗</a></nav><span class="edition">ARQUITECTURA Y OTRAS IDEAS</span></header><main class="sim-main"><div class="crumb"><a href="./index.html">Inicio</a> / <a href="./laboratorio--index.html">Laboratorio</a> / <a href="./laboratorio--bouncing-balls--index.html">Bouncing balls</a></div><div class="sim-heading"><div><div class="eyebrow">Bouncing balls / 02</div><h1>Duelo de pelotas <span>y líneas.</span></h1><p>Dos pelotas generan líneas al rebotar y cortan las del rival. ¿Cuál conservará las suyas?</p></div><a class="back" href="./laboratorio--bouncing-balls--index.html">← Ver categoría</a></div><div class="sim-layout"><section id="arena" aria-label="Área del duelo"><div id="scoreboard">
+    <div id="score-a" style="color:#ff5252;">Pelota A: 0 líneas</div>
+    <div id="score-b" style="color:#00e5ff;">Pelota B: 0 líneas</div>
+  </div>
+
+  <canvas id="simCanvas" aria-label="Simulación de duelo entre dos pelotas"></canvas><p id="match-status" role="status"></p><div id="audio-start"><div><h2>Duelo listo</h2><p id="start-help">Preparando audio… Si tu navegador requiere un gesto, pulsa iniciar.</p><button id="start-audio" type="button">Iniciar con sonido</button><button id="start-silent" type="button">Iniciar sin sonido</button></div></div></section>
+
+  <aside id="editor-panel" aria-label="Controles del duelo">
+    <h2>Ajusta el duelo</h2><details class="rules"><summary>Reglas y funcionamiento</summary><p>Las pelotas tienen igual masa. Pierdes al quedarte sin líneas después de haber tenido alguna; si ambas las pierden a la vez, hay empate. Sin líneas iniciales, cada pelota entra en juego tras generar su primera línea.</p><p>Las pelotas crecen al chocar con el borde y entre sí. Tras tres choques frontales repetidos se aplica una pequeña desviación de contacto que conserva energía y momento antes del límite de velocidad. El crecimiento se limita al 30% del radio del círculo por pelota y la velocidad a 900 px/s. El tiempo sigue la simulación: se congela al pausar u ocultar la pestaña y se ralentiza si el equipo no logra mantener el ritmo.</p></details>
+
+    <div class="control-group">
+      <label for="in-speed">Velocidad Inicial: <span id="val-speed" class="value-display">4</span></label>
+<input type="range" id="in-speed" min="1" max="12" step="0.5" value="4">
+    </div>
+
+    <div class="control-group">
+      <label for="in-boost">Fuerza de Rebote (impacto): <span id="val-boost" class="value-display">1.0x</span></label>
+<input type="range" id="in-boost" min="0.2" max="3" step="0.1" value="1.0">
+    </div>
+
+    <div class="control-group">
+      <label for="in-ball-size">Tamaño Inicial de las Pelotas: <span id="val-ball-size" class="value-display">8px</span></label>
+<input type="range" id="in-ball-size" min="3" max="25" step="1" value="8">
+    </div>
+
+    <div class="control-group">
+      <label for="in-start-lines">Líneas Iniciales por Pelota:</label>
+<input type="number" id="in-start-lines" min="0" max="80" value="8">
+    </div>
+
+    <div class="control-group">
+      <label for="in-growth">Crecimiento por Rebote: <span id="val-growth" class="value-display">1.0px</span></label>
+<input type="range" id="in-growth" min="0" max="4" step="0.1" value="1.0">
+    </div>
+
+    <div class="control-group">
+      <label for="in-container-size">Tamaño del Contenedor: <span id="val-container-size" class="value-display">42%</span></label>
+<input type="range" id="in-container-size" min="25" max="48" step="1" value="42">
+    </div>
+
+    <div class="control-group">
+      <label for="in-vol">Volumen de Sonido: <span id="val-vol" class="value-display">150%</span></label>
+<input type="range" id="in-vol" min="0" max="4" step="0.05" value="1.5">
+    </div>
+
+
+    <details><summary>Timbre y carácter del sonido</summary>
+<p>Volumen inicial 150%, máximo 400%, con limitador de picos. Todos los timbres siguen las notas escritas en bucle. Sonido directo, sin eco ni reverberación.</p>
+<label for="in-wave">Forma de onda</label><select id="in-wave"><option value="sine">Seno · suave</option><option value="triangle" selected>Triángulo · cálido</option><option value="sawtooth">Sierra · brillante</option><option value="square">Cuadrada · hueca</option></select>
+<div class="control-group"><label for="in-pitch">Registro (semitonos): <span id="val-pitch" class="value-display">0</span></label><input type="range" id="in-pitch" min="-24" max="24" step="1" value="0"></div>
+<div class="control-group"><label for="in-attack">Ataque: <span id="val-attack" class="value-display">3 ms</span></label><input type="range" id="in-attack" min="1" max="100" step="0.5" value="3"></div>
+<div class="control-group"><label for="in-decay">Duración / caída: <span id="val-decay" class="value-display">180 ms</span></label><input type="range" id="in-decay" min="30" max="1200" step="10" value="180"></div>
+<div class="control-group"><label for="in-brightness">Brillo (filtro): <span id="val-brightness" class="value-display">9000 Hz</span></label><input type="range" id="in-brightness" min="200" max="16000" step="100" value="9000"></div>
+<div class="control-group"><label for="in-metal">Carácter metálico: <span id="val-metal" class="value-display">0%</span></label><input type="range" id="in-metal" min="0" max="100" step="1" value="0"></div>
+<div class="control-group"><label for="in-metal-ratio">Relación metálica: <span id="val-metal-ratio" class="value-display">2.75</span></label><input type="range" id="in-metal-ratio" min="0.5" max="8" step="0.05" value="2.75"></div>
+<p>Para un golpe seco: ataque corto y duración de 30–100 ms. Para grave o agudo: ajusta el registro. Para metal: aumenta el carácter metálico y el brillo.</p>
+<button id="test-sound" type="button">Probar secuencia</button><button id="stop-preview" type="button">Detener prueba</button><p>La prueba reproduce una vuelta de hasta 32 notas sin avanzar el duelo y lo pausa mientras suena.</p></details>
+<div class="control-group"><label for="in-notes">Secuencia de notas</label>
+      <textarea id="in-notes" rows="3" maxlength="4000" aria-describedby="note-help note-status">re - re - RE# - la - sol# - sol - fa - re - fa - sol</textarea>
+      <p id="note-help">Minúsculas = octava normal (4): <strong>re</strong>. Mayúsculas completas = una octava más aguda (5): <strong>RE</strong>. Usa # para sostenido y b o ♭ para bemol: <strong>re#, RE#, sib</strong>. Separa con guiones, espacios o comas y pulsa «Aplicar notas». Un número fija la octava (1–7): <strong>re3, RE4</strong>. También admite C D E F G A B en octava 4; para agudas, escribe D5. Por compatibilidad, Re equivale a re.</p>
+      <button id="apply-notes" type="button">Aplicar notas</button><p id="note-status" role="status"></p>
+    </div>
+    <div class="control-group"><label><input id="in-gravity" type="checkbox" checked> Activar gravedad</label></div>
+    <div class="control-group"><label><input id="in-random-lines" type="checkbox"> Líneas aleatorias en cada choque</label>
+      <div class="pair"><label for="in-lines-min">Mínimo<input id="in-lines-min" type="number" min="1" max="20" value="1"></label><label for="in-lines-max">Máximo<input id="in-lines-max" type="number" min="1" max="20" value="4"></label></div>
+      <p>En modo aleatorio, cada choque con el borde o la otra pelota crea entre estos valores. Los anclajes se distribuyen por el borde. Máximo: 400 líneas por pelota.</p>
+    </div>
+
+    <div class="section-title a">● Pelota A</div>
+
+    <div class="control-group color-row">
+      <label for="in-ball-a-color">Color Pelota A:</label>
+<input type="color" id="in-ball-a-color" value="#ff5252">
+    </div>
+
+    <div class="control-group">
+      <label for="in-image-a">Reemplazar por PNG/JPG:</label>
+<input type="file" id="in-image-a" accept="image/png, image/jpeg">
+    </div>
+
+    <div class="control-group color-row">
+      <label for="in-line-a-color">Color de sus Líneas:</label>
+<input type="color" id="in-line-a-color" value="#ff5252">
+    </div>
+
+    <div class="control-group">
+      <label for="in-line-a-width">Grosor de sus Líneas: <span id="val-line-a-width" class="value-display">1.5</span></label>
+<input type="range" id="in-line-a-width" min="0.5" max="6" step="0.5" value="1.5">
+    </div>
+
+    <div class="section-title b">● Pelota B</div>
+
+    <div class="control-group color-row">
+      <label for="in-ball-b-color">Color Pelota B:</label>
+<input type="color" id="in-ball-b-color" value="#00e5ff">
+    </div>
+
+    <div class="control-group">
+      <label for="in-image-b">Reemplazar por PNG/JPG:</label>
+<input type="file" id="in-image-b" accept="image/png, image/jpeg">
+    </div>
+
+    <div class="control-group color-row">
+      <label for="in-line-b-color">Color de sus Líneas:</label>
+<input type="color" id="in-line-b-color" value="#00e5ff">
+    </div>
+
+    <div class="control-group">
+      <label for="in-line-b-width">Grosor de sus Líneas: <span id="val-line-b-width" class="value-display">1.5</span></label>
+<input type="range" id="in-line-b-width" min="0.5" max="6" step="0.5" value="1.5">
+    </div>
+
+    <div class="control-group" style="margin-top:16px;">
+      <label class="checkbox-container">
+        <input type="checkbox" id="in-show-timer" checked> Mostrar Temporizador
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label for="in-timer-mode">Modo de Temporizador:</label>
+<select id="in-timer-mode">
+        <option value="countdown">Cuenta Atrás (Regresivo)</option>
+        <option value="stopwatch">Cronómetro (Ascendente)</option>
+      </select>
+    </div>
+
+    <div class="control-group" id="countdown-config-group">
+      <label for="in-countdown-start">Segundos Iniciales (Cuenta Atrás):</label>
+<input type="number" id="in-countdown-start" min="5" max="300" value="60">
+    </div>
+
+    <p>Velocidad inicial, tamaño inicial, líneas iniciales y opciones de tiempo reinician el duelo al confirmar el cambio. El resto se aplica en vivo.</p><button id="btn-pause">Pausar</button><button id="btn-sound">Activar audio</button><p id="audio-status" role="status">Audio desactivado</p><p id="image-status" role="status"></p><button id="btn-reset">Reiniciar Duelo</button>
+  </aside></div><p class="sim-note">Pierde la pelota que se queda sin líneas después de haber tenido alguna. Ajusta la gravedad, el crecimiento y el sonido para cambiar el duelo. Las imágenes se procesan en tu navegador.</p></main><footer><a class="brand" href="./index.html">arquitools.</a><span>Para proyectar, resolver y experimentar.</span></footer></body></html>
