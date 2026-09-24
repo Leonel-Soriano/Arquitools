@@ -64,10 +64,10 @@ window.ARQUITOOLS = [
     "titulo": "Estudio de cabida",
     "categoria": "arquitectura",
     "descripcion": "Explora las posibilidades de un terreno.",
-    "detalle": "Un espacio para evaluar superficies, ocupación y posibilidades de edificación. La herramienta se incorporará aquí cuando esté disponible.",
+    "detalle": "Versión preliminar: planta, elevaciones y superficies del proyecto.",
     "icono": "▤",
-    "estado": "proximamente",
-    "url": null
+    "estado": "disponible",
+    "url": "/arquitectura/estudio-de-cabida/"
   },
   {
     "slug": "dividir-la-cuenta",
@@ -102,3 +102,4 @@ window.ARQUITOOLS = [
     "url": "/laboratorio/bouncing-balls/duelo-pelotas-lineas/"
   }
 ];
+

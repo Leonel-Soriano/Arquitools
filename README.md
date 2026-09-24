@@ -1,13 +1,9 @@
-# Arquitools — versión SIN subcarpetas
+# Arquitools — cabida preliminar
 
-Todos los archivos están en el mismo nivel y tienen nombres únicos. No debes crear ni subir subcarpetas.
+Esta carpeta contiene únicamente los archivos públicos.
 
-1. Extrae este ZIP con «Extraer todo» en una carpeta nueva. No mezcles los archivos con descargas anteriores.
-2. Abre la carpeta extraída. Debe haber un index.html, rutas.js y archivos como arquitectura--escalimetro--index.html. No debe haber nombres como index (1).html.
-3. En la raíz de tu repositorio, usa Add file → Upload files y selecciona todos estos archivos. Conserva exactamente sus nombres y confirma los cambios en la rama que publica Pages.
-4. Si aparecen archivos antiguos con nombres como index (1).html, no forman parte de esta versión; ya no se utilizan. No hace falta borrar el repositorio. Reemplaza index.html, app.js y los demás archivos coincidentes con los nuevos.
-5. En Settings → Pages, usa Deploy from a branch, tu rama (normalmente main) y /(root). Espera la publicación y recarga con Ctrl+F5.
+Antes de publicar el generador, despliega el Worker privado y configura su URL en arquitectura--estudio-de-cabida--config.js. La vista previa local funciona con su servidor local; GitHub Pages necesita el Worker.
 
-Incluye .nojekyll. No subas el ZIP sin extraer. No renombres los archivos ni quites los guiones dobles. No requiere instalación ni compilación. Funciona en la raíz o en la carpeta de cualquier repositorio.
+Sube los archivos de esta carpeta a la raíz de GitHub, reemplazando los mismos nombres. No borres CNAME ni ads.txt que ya existen en el repositorio. Conserva .nojekyll. No subas private/, el HTML original ni el ZIP del servidor.
 
-Incluye arquitectura, fabricación, seis herramientas y dos simuladores. Los mensajes se preparan en Gmail/WhatsApp para que el visitante decida enviarlos.
+No se han añadido ni cambiado códigos de AdSense. El generador incluye cinco vistas y exportaciones PNG, JPG, SVG y DXF. Modelo preliminar 0.1.0.

@@ -1,4 +1,262 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Arquitools — Arquitectura, regularización y herramientas</title><meta name="description" content="Servicios de arquitectura y regularización de viviendas en la Región Metropolitana. Explora también nuestras herramientas, utilidades y simuladores."><meta name="theme-color" content="#233d32"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23233d32'/%3E%3Ctext x='6' y='24' font-family='Arial' font-size='27' font-weight='bold' fill='%23d8eb6a'%3Ea%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./oficina.css"><link rel="stylesheet" href="./fabricacion.css"><script defer src="./catalogo.js"></script><script defer src="./oficina.js"></script><script defer src="./fabricacion.js"></script><script defer src="./app.js"></script><script src="./rutas.js"></script></head><body><div id="app"></div><noscript>Activa JavaScript para explorar el catálogo de Arquitools.</noscript></body></html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Estudio de cabida — Arquitools</title><meta name="description" content="Explora la ocupación, las superficies y las elevaciones de tu proyecto. Versión preliminar."><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23233d32'/%3E%3Ctext x='6' y='24' font-family='Arial' font-size='27' font-weight='bold' fill='%23d8eb6a'%3Ea%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./oficina.css"><link rel="stylesheet" href="./arquitectura--estudio-de-cabida--cabida-base.css"><link rel="stylesheet" href="./arquitectura--estudio-de-cabida--cabida.css"><script defer src="./arquitectura--estudio-de-cabida--config.js"></script><script defer src="./arquitectura--estudio-de-cabida--render.js"></script><script defer src="./arquitectura--estudio-de-cabida--client.js"></script><script src="./rutas.js"></script></head><body><header><a href="./index.html" class="brand" aria-label="Arquitools, inicio"><b aria-hidden="true">a/</b>arquitools<span style="color:#869870">.</span></a><nav aria-label="Navegación principal"><a href="./index.html#oficina">La oficina</a><a href="./index.html#servicios">Servicios</a><a href="./arquitectura--index.html" aria-current="page">Herramientas</a><a href="./index.html#contacto">Contacto ↗</a></nav><span class="edition">ARQUITECTURA Y OTRAS IDEAS</span></header><main class="cabida-main"><div class="crumb"><a href="./index.html">Inicio</a> / <a href="./arquitectura--index.html">Arquitectura</a> / Estudio de cabida</div><section class="cabida-heading"><div class="eyebrow">Herramientas de arquitectura <span class="beta">Preliminar · 0.1</span></div><h1>Estudio de<br>cabida<span>.</span></h1><p>Del terreno a sus posibilidades. Explora ocupación, constructibilidad y elevaciones en un mismo estudio.</p></section><div class="cabida-notice">Modelo geométrico preliminar, sujeto a cambios. Revisa las hipótesis y los parámetros aplicables a tu proyecto antes de utilizar los resultados.</div><nav class="cabida-jumps" aria-label="Secciones del estudio"><a href="#paso-1">01 / Terreno y planta</a><a href="#paso-2">02 / Altura y rasantes</a><a href="#paso-6">06 / Resumen</a></nav><div class="cabida-actions"><button id="calculate" type="button">Actualizar estudio ↗</button><span id="calculation-status" role="status" aria-live="polite">Preparando estudio…</span></div>
+    <div class="panel" style="max-width:1260px;margin:0 auto 20px;">
+        <h3>Estudio de cabida · Modelo geométrico</h3>
+        <p class="legend-text">Terrenos de cuatro lados convexos. Al editar un ángulo, los otros tres se recalculan para cerrar el terreno. Planta, superficies y elevaciones se obtienen de los mismos polígonos por piso.</p>
+        <details><summary>Hipótesis de esta versión</summary><p class="legend-text">Terreno horizontal y una calle paralela al frente A-B. Los retiros de subsuelo se suman a los distanciamientos efectivos del agrupamiento. Las elevaciones son proyecciones ortogonales completas, no cortes. El eje vial se muestra como referencia auxiliar incluso si queda oculto por el volumen; cuando no se ve de punta se proyecta a nivel de terreno. Las rectas de rasante son generatrices proyectadas de los planos transversales a cada vista; no constituyen el contorno completo de la envolvente. El contorno combinado puede activarse como diagnóstico y tener quiebres cuando cambia el plano limitante. La referencia E identifica un punto del eje de calle, alineado perpendicularmente con el frente del piso 1. La huella limitada por COS se usa como base de todos los pisos normales. Los niveles especiales usan retranqueos de 45° desde el piso inferior y el porcentaje indicado. El mecánico puede generarse sobre el último piso normal si no se agrega el retirado. Los subterráneos se excluyen del CC; los pisos especiales se incluyen. Estos criterios son parámetros del modelo, pendientes de contrastar con la normativa aplicable al proyecto.</p></details>
+    </div>
 
+    <!-- SECCIÓN 1: PLANTA -->
+    <h2 class="section-title" id="paso-1">1. Planta — Perímetro, Coeficientes y Ocupación</h2>
+    <div class="app-container">
+        <div class="panel">
+            <h3>Perímetro y Ángulos (Planta)</h3>
+            <div id="errorBox" class="error-msg">El polígono no cierra. Ajusta las distancias.</div>
+            <div class="grid-inputs">
+                <div class="input-box">
+                    <div class="input-group"><label for="side0">Frente A-B</label><input type="number" id="side0" class="side-input" value="25" step="0.5"></div>
+                    <div class="input-group"><label for="angle0">Ángulo A</label><input type="number" id="angle0" class="angle-input" value="90" step="0.1"></div>
+                </div>
+                <div class="input-box">
+                    <div class="input-group"><label for="side1">Deslinde B-C</label><input type="number" id="side1" class="side-input" value="45.18" step="0.5"></div>
+                    <div class="input-group"><label for="angle1">Ángulo B</label><input type="number" id="angle1" class="angle-input" value="90" step="0.1"></div>
+                </div>
+                <div class="input-box">
+                    <div class="input-group"><label for="side2">Fondo C-D</label><input type="number" id="side2" class="side-input" value="25" step="0.5"></div>
+                    <div class="input-group"><label for="angle2">Ángulo C</label><input type="number" id="angle2" class="angle-input" value="90" step="0.1"></div>
+                </div>
+                <div class="input-box">
+                    <div class="input-group"><label for="side3">Deslinde D-A</label><input type="number" id="side3" class="side-input" value="45.25" step="0.5"></div>
+                    <div class="input-group"><label for="angle3">Ángulo D</label><input type="number" id="angle3" class="angle-input" value="90" step="0.1"></div>
+                </div>
+            </div>
 
+            <h3>Distanciamientos Normativos (Mts)</h3>
+            <div class="grid-inputs">
+                <div class="input-group"><label for="distEje">Eje a L.O.</label><input type="number" id="distEje" class="trigger-draw" value="10.45" step="0.1"></div>
+                <div class="input-group"><label for="off0">Antejardín</label><input type="number" id="off0" class="trigger-draw" value="7" step="0.5"></div>
+                <div class="input-group"><label for="off1">Dist. Der (BC)</label><input type="number" id="off1" class="trigger-draw" value="8" step="0.5"></div>
+                <div class="input-group"><label for="off3">Dist. Izq (DA)</label><input type="number" id="off3" class="trigger-draw" value="8" step="0.5"></div>
+                <div class="input-group"><label for="off2">Dist. Fondo (CD)</label><input type="number" id="off2" class="trigger-draw" value="5" step="0.5"></div>
+            </div>
+
+            <h3>Sistema de Agrupamiento</h3>
+            <div class="grid-inputs" style="margin-bottom:10px;">
+                <div class="input-box">
+                    <div class="input-group"><label>Sistema</label>
+                        <select id="agrupamiento" class="trigger-draw">
+                            <option value="aislado">Aislado</option>
+                            <option value="pareado">Pareado</option>
+                            <option value="continuo">Continuo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-box">
+                    <div class="input-group"><label>Lado de Pareo</label>
+                        <select id="ladoPareo" class="trigger-draw">
+                            <option value="BC">Deslinde Derecho (BC)</option>
+                            <option value="DA">Deslinde Izquierdo (DA)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <p class="legend-text" style="margin-top:-6px;">Aislado: usa Dist. Der (BC) y Dist. Izq (DA) tal cual. Pareado: el lado elegido usa retiro 0 m y los parámetros de rasante adosada configurados y el otro mantiene su distanciamiento. Continuo: ambos deslindes quedan adosados, maximizando el ancho edificable.</p>
+
+            <h3>Coeficientes Normativos</h3>
+            <div class="grid-inputs" style="margin-bottom:10px;">
+                <div class="input-box">
+                    <div class="input-group"><label for="cosVal">Coef. Ocupación de Suelo</label><input type="number" id="cosVal" class="trigger-draw" value="0.4" step="0.01" min="0" max="1"></div>
+                    <div class="coef-result" id="cosResult">—</div>
+                </div>
+                <div class="input-box">
+                    <div class="input-group"><label for="ccVal">Coef. Constructibilidad</label><input type="number" id="ccVal" class="trigger-draw" value="3.5" step="0.1" min="0"></div>
+                    <div class="coef-result" id="ccResult">—</div>
+                </div>
+            </div>
+            <div class="coef-result" id="areaTerrenoResult">Área de terreno: —</div>
+        </div>
+
+        <div class="panel" style="padding: 10px;">
+            <div class="export-menu">
+                <button class="export-btn">Exportar Planta ▼</button>
+                <div class="export-dropdown">
+                    <button type="button" class="export-option" onclick="exportPNG('plotCanvas','planta.png')">Imagen (PNG)</button>
+                    <button type="button" class="export-option" onclick="exportJPG('plotCanvas','planta.jpg')">Imagen (JPG)</button>
+                    <button type="button" class="export-option" onclick="exportSVGView('plan','planta.svg')">Vectorial (SVG)</button>
+                    <button type="button" class="export-option" onclick="exportDXFView('plan','planta.dxf')">CAD (DXF) 1:1</button>
+                </div>
+            </div>
+            <canvas id="plotCanvas" width="800" height="600"></canvas>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: CORTE LONGITUDINAL -->
+    <h2 class="section-title" id="paso-2">2. Elevación A–D — Rasantes y Subterráneos</h2>
+    <div class="app-container">
+        <div class="panel">
+            <h3>Parámetros de Elevación</h3><p class="legend-text">Vista perpendicular a A–D. Las líneas de referencia de A y D no recortan el edificio. Se distinguen las caras visibles y se acotan por separado el deslinde y el ancho total proyectado del predio.</p>
+
+            <div class="input-box" style="margin-bottom:15px;">
+                <div class="input-group">
+                    <label for="altMax">Altura Máxima Permitida (m)</label>
+                    <input type="number" id="altMax" class="trigger-draw" value="52.5" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="altPiso">Altura por Piso (m)</label>
+                    <input type="number" id="altPiso" class="trigger-draw" value="3.5" step="0.1">
+                </div>
+            </div>
+
+            <h3>Parámetros de Rasante</h3><div class="checkbox-group"><input type="checkbox" id="showEnvelope" class="trigger-draw"><label for="showEnvelope">Mostrar contorno de la envolvente 3D</label></div>
+            <p class="legend-text">Las rectas representan generatrices de los planos de rasante. El ángulo indicado es el real, medido perpendicularmente al deslinde; puede verse distinto al proyectarlo. El contorno 3D opcional combina todos los planos y puede tener quiebres: no es otra rasante ni nace una rasante frontal adicional en A o B.</p>
+            <div class="grid-inputs">
+                <div class="input-box">
+                    <div class="input-group"><label for="gradoAislado">Ángulo (deslinde aislado)</label><input type="number" id="gradoAislado" class="trigger-draw" value="70" step="1" min="1" max="89"></div>
+                    <div class="input-group"><label for="alturaAislado">Altura desde la que parte</label><input type="number" id="alturaAislado" class="trigger-draw" value="0" step="0.5" min="0"></div>
+                </div>
+                <div class="input-box">
+                    <div class="input-group"><label for="gradoAdosado">Ángulo (deslinde adosado)</label><input type="number" id="gradoAdosado" class="trigger-draw" value="45" step="1" min="1" max="89"></div>
+                    <div class="input-group"><label for="alturaAdosado">Altura desde la que parte</label><input type="number" id="alturaAdosado" class="trigger-draw" value="3.5" step="0.5" min="0"></div>
+                </div>
+            </div>
+            <p class="legend-text" style="margin-top:-6px;">Aislado = deslinde con distanciamiento real (rasante desde nivel de terreno). Adosado = deslinde con distancia 0 (por dato directo o por sistema pareado/continuo), rasante desde la altura indicada.</p>
+
+            <h3>Subterráneos</h3>
+            <div class="input-box" style="margin-bottom:15px;">
+                <div class="input-group">
+                    <label for="nivSub">Cant. Niveles Subterráneos</label>
+                    <input type="number" id="nivSub" class="trigger-draw" value="2" step="1" min="0">
+                </div>
+            </div>
+            <div class="grid-inputs">
+                <div class="input-box"><div class="input-group"><label for="retSub0">Retiro Subsuelo Antejardín</label><input type="number" id="retSub0" class="trigger-draw" value="1" step="0.5"></div></div>
+                <div class="input-box"><div class="input-group"><label for="retSub1">Retiro Subsuelo Deslinde BC</label><input type="number" id="retSub1" class="trigger-draw" value="0.5" step="0.5"></div></div>
+                <div class="input-box"><div class="input-group"><label for="retSub2">Retiro Subsuelo Fondo</label><input type="number" id="retSub2" class="trigger-draw" value="0.5" step="0.5"></div></div>
+                <div class="input-box"><div class="input-group"><label for="retSub3">Retiro Subsuelo Deslinde DA</label><input type="number" id="retSub3" class="trigger-draw" value="0.5" step="0.5"></div></div>
+            </div>
+
+            <h3>Volumetría Especial — Parámetros del Modelo</h3>
+            <div class="input-box" style="margin-bottom:15px;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chkRetirado" class="trigger-draw" checked>
+                    <label for="chkRetirado">Incluir Piso Retirado (Sobre último piso normal)</label>
+                </div>
+                <div class="grid-inputs" style="margin-bottom:10px;">
+                    <div class="input-group"><label for="pctRetirado">% máx. respecto al piso inferior</label><input type="number" id="pctRetirado" class="trigger-draw" value="70" step="5" min="0" max="100"></div>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chkMecanico" class="trigger-draw" checked>
+                    <label for="chkMecanico">Incluir Piso Mecánico (Sobre último nivel generado)</label>
+                </div>
+                <div class="grid-inputs">
+                    <div class="input-group"><label for="pctMecanico">% máx. respecto al piso inferior</label><input type="number" id="pctMecanico" class="trigger-draw" value="30" step="5" min="0" max="100"></div>
+                </div>
+                <p class="legend-text" style="margin-top:8px;margin-bottom:0;">El porcentaje limita la superficie respecto al nivel inferior; las rasantes y retranqueos pueden reducirla aún más. Con 0 % no se agrega ese nivel.</p>
+            </div>
+
+            <div class="coef-result" id="ccUsageText">Constructibilidad utilizada: —</div>
+            <div class="usage-bar-bg"><div class="usage-bar-fill" id="usageBarFill"></div></div>
+        </div>
+
+        <div class="panel" style="padding: 10px;">
+            <div class="export-menu">
+                <button class="export-btn">Exportar Elevación ▼</button>
+                <div class="export-dropdown">
+                    <button type="button" class="export-option" onclick="exportPNG('sectionCanvas','elevacion-A-D.png')">Imagen (PNG)</button>
+                    <button type="button" class="export-option" onclick="exportJPG('sectionCanvas','elevacion-A-D.jpg')">Imagen (JPG)</button>
+                    <button type="button" class="export-option" onclick="exportSVGView('sec1','elevacion-A-D.svg')">Vectorial (SVG)</button>
+                    <button type="button" class="export-option" onclick="exportDXFView('sec1','elevacion-A-D.dxf')">CAD (DXF) 1:1</button>
+                </div>
+            </div>
+            <canvas aria-label="Elevación A-D" id="sectionCanvas" width="800" height="720"></canvas>
+        </div>
+    </div>
+
+    <h2 class="section-title" id="paso-3">3. Elevación C–B — Rasantes y Subterráneos</h2>
+    <div class="app-container">
+        <div class="panel">
+            <h3>Elevación C–B</h3>
+            <p class="legend-text">Vista perpendicular al deslinde C–B, con C a la izquierda y B a la derecha. Las caras, el eje de calle y las rasantes se proyectan según la orientación real del deslinde.</p>
+            <p class="legend-text">Los parámetros de altura, rasantes y subterráneos se editan en la Elevación A–D y se aplican a las cuatro vistas.</p>
+        </div>
+        <div class="panel" style="padding:10px;">
+            <div class="export-menu">
+                <button class="export-btn">Exportar Elevación ▼</button>
+                <div class="export-dropdown">
+                    <button type="button" class="export-option" onclick="exportPNG('sectionCanvasCB','elevacion-C-B.png')">Imagen (PNG)</button>
+                    <button type="button" class="export-option" onclick="exportJPG('sectionCanvasCB','elevacion-C-B.jpg')">Imagen (JPG)</button>
+                    <button type="button" class="export-option" onclick="exportSVGView('secCB','elevacion-C-B.svg')">Vectorial (SVG)</button>
+                    <button type="button" class="export-option" onclick="exportDXFView('secCB','elevacion-C-B.dxf')">CAD (DXF) 1:1</button>
+                </div>
+            </div>
+            <canvas id="sectionCanvasCB" width="800" height="720" aria-label="Elevación C-B"></canvas>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: ELEVACIÓN TRANSVERSAL -->
+    <h2 class="section-title" id="paso-4">4. Elevación B–A — Rasantes y Subterráneos</h2>
+    <div class="app-container">
+        <div class="panel">
+            <h3>Elevación B–A</h3>
+            <p class="legend-text">Proyección ortográfica del volumen sobre el eje del frente A-B. Las cotas indican dimensiones proyectadas, no longitudes oblicuas. Usa la misma altura máxima, altura de piso, niveles subterráneos, retiros de subsuelo, parámetros de rasante y volumetría especial definidos en la Elevación A–D.</p>
+            <div id="stopExplanation" class="coef-result">—</div>
+            <div class="coef-result" id="ccUsageTextAB" style="margin-top:8px;">Constructibilidad utilizada: —</div>
+            <div class="usage-bar-bg"><div class="usage-bar-fill" id="usageBarFillAB"></div></div>
+
+            <h3 style="margin-top:18px;">Unidades de Cotas</h3>
+            <div class="grid-inputs" style="margin-bottom:0;">
+                <div class="input-group"><label>Unidad</label>
+                    <select id="cotaUnidad" class="trigger-draw">
+                        <option value="m">Metros (m)</option>
+                        <option value="cm">Centímetros (cm)</option>
+                    </select>
+                </div>
+                <div class="input-group"><label for="cotaDecimales">Decimales</label><input type="number" id="cotaDecimales" class="trigger-draw" value="2" step="1" min="0" max="4"></div>
+            </div>
+        </div>
+
+        <div class="panel" style="padding: 10px;">
+            <div class="export-menu">
+                <button class="export-btn">Exportar Elevación ▼</button>
+                <div class="export-dropdown">
+                    <button type="button" class="export-option" onclick="exportPNG('sectionCanvas2','elevacion-B-A.png')">Imagen (PNG)</button>
+                    <button type="button" class="export-option" onclick="exportJPG('sectionCanvas2','elevacion-B-A.jpg')">Imagen (JPG)</button>
+                    <button type="button" class="export-option" onclick="exportSVGView('sec2','elevacion-B-A.svg')">Vectorial (SVG)</button>
+                    <button type="button" class="export-option" onclick="exportDXFView('sec2','elevacion-B-A.dxf')">CAD (DXF) 1:1</button>
+                </div>
+            </div>
+            <canvas aria-label="Elevación B-A" id="sectionCanvas2" width="800" height="720"></canvas>
+        </div>
+    </div>
+
+    <h2 class="section-title" id="paso-5">5. Elevación D–C — Rasantes y Subterráneos</h2>
+    <div class="app-container">
+        <div class="panel">
+            <h3>Elevación D–C</h3>
+            <p class="legend-text">Vista perpendicular al deslinde D–C, con D a la izquierda y C a la derecha. Incluye el volumen completo, aunque su proyección sobrepase estos vértices.</p>
+            <p class="legend-text">Los parámetros de altura, rasantes y subterráneos se editan en la Elevación A–D y se aplican a las cuatro vistas.</p>
+        </div>
+        <div class="panel" style="padding:10px;">
+            <div class="export-menu">
+                <button class="export-btn">Exportar Elevación ▼</button>
+                <div class="export-dropdown">
+                    <button type="button" class="export-option" onclick="exportPNG('sectionCanvasDC','elevacion-D-C.png')">Imagen (PNG)</button>
+                    <button type="button" class="export-option" onclick="exportJPG('sectionCanvasDC','elevacion-D-C.jpg')">Imagen (JPG)</button>
+                    <button type="button" class="export-option" onclick="exportSVGView('secDC','elevacion-D-C.svg')">Vectorial (SVG)</button>
+                    <button type="button" class="export-option" onclick="exportDXFView('secDC','elevacion-D-C.dxf')">CAD (DXF) 1:1</button>
+                </div>
+            </div>
+            <canvas id="sectionCanvasDC" width="800" height="720" aria-label="Elevación D-C"></canvas>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 5: RESUMEN DEL PROYECTO -->
+    <h2 class="section-title" id="paso-6">6. Resumen del Proyecto</h2>
+    <div style="max-width:1300px; margin:0 auto 20px auto;">
+        <div class="panel" id="resumenProyecto">
+            <p class="legend-text">Completa los parámetros de las secciones anteriores para ver aquí el resumen.</p>
+        </div>
+    </div>
+
+    
+
+    <a class="back" href="./arquitectura--index.html">← Herramientas de arquitectura</a></main><footer><a class="brand" href="./index.html">arquitools.</a><span>Para proyectar, resolver y experimentar.</span><span>Estudio de cabida · Versión preliminar</span></footer></body></html>
